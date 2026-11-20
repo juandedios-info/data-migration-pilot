@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environment (managed by uv)
+.venv/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Project data and generated outputs
+data/*.csv
+backups/
+logs/
+*.avro
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
