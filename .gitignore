@@ -16,7 +16,7 @@ dist/
 !.env.example
 
 # Project data and generated outputs
-data/*.csv
+data/
 backups/
 logs/
 *.avro
