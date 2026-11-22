@@ -32,6 +32,8 @@ profiling/       SQL queries used to profile the raw data (DuckDB)
 docs/
   data_profile.md   profiling report and schema decisions
   raw_data.sha256   checksums of the raw files
+Dockerfile
+docker-compose.yml
 ```
 
 ## Design decisions
@@ -54,7 +56,41 @@ In short:
   UTC for year and quarter. With another time zone, 4 hires at the start of
   2022 would count as 2021.
 
-## Setup
+## Quick start with Docker
+
+Requirements: Docker with Docker Compose.
+
+1. Put the raw CSV files in `data/raw/`, and create the configuration:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Set `POSTGRES_PASSWORD` in `.env`. If the password contains `$`, put it in
+   single quotes.
+
+2. Start the database and the API. The schema is created automatically:
+
+   ```bash
+   docker compose up -d --build db api
+   ```
+
+3. Load the historical data (runs once):
+
+   ```bash
+   docker compose run --rm loader
+   ```
+
+4. Open the API documentation: http://127.0.0.1:8080/docs
+
+The database is published on port 5433, so it can be opened with a SQL client.
+To stop everything and delete the database volume:
+
+```bash
+docker compose down -v
+```
+
+## Setup without Docker
 
 Requirements: Python 3.12, [uv](https://docs.astral.sh/uv/), PostgreSQL.
 
@@ -86,6 +122,9 @@ Requirements: Python 3.12, [uv](https://docs.astral.sh/uv/), PostgreSQL.
    ```
 
 ## Usage
+
+The examples use the local setup. With Docker, the API is on port 8080
+instead of 8000.
 
 ### Load the historical data
 
@@ -146,23 +185,26 @@ cancelled and nothing changes.
 
 ## Security
 
-- No password in the project: the connection uses `~/.pgpass`.
+- No password in the project: the local setup uses `~/.pgpass`, and Docker
+  reads the password from `.env`, which is not committed.
 - SQL values are always sent as parameters, and table names are composed with
   `psycopg.sql`, so the input cannot change the SQL.
 - The table name in the API is limited to the three tables.
 - Each request accepts at most 1,000 rows.
 - Backup and restore are command-line tools, not API endpoints, because a
   restore replaces a whole table.
+- The container runs as a non-root user, and the image does not include `.env`
+  or the data files.
 
 ## Next steps
 
-- **Faster loading:** the loader inserts row by row. It took about 26 seconds
-  for 1,999 rows over the network. For large files, I would validate the rows
-  and load them with `COPY`.
+- **Faster loading:** the loader inserts row by row. Over a home network it
+  took about 26 seconds for 1,999 rows; inside Docker, next to the database,
+  it took less than a second. The time is in the round trips, so for large
+  files I would validate the rows and load them with `COPY`.
 - **API authentication:** for example, an API key or OAuth2 tokens, and HTTPS.
 - **Error responses:** do not return the full request body in validation errors.
 - **Automated tests** with pytest, run in GitHub Actions.
-- **Docker:** a Dockerfile and docker-compose with PostgreSQL.
 - **Cloud deployment on AWS:** raw files in S3, the database in RDS, the API on
-  EC2 or ECS, and logs in CloudWatch.
+  EC2 or ECS, the password in Secrets Manager, and logs in CloudWatch.
 - **Visual report** for the metrics.
