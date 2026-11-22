@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: data_migration_poc
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      # The schema runs automatically the first time the database starts.
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d data_migration_poc"]
+      interval: 2s
+      retries: 15
+
+  api:
+    build: .
+    environment: &database
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: data_migration_poc
+      PGUSER: app
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Runs once, on demand: docker compose run --rm loader
+  loader:
+    build: .
+    command: ["python", "-m", "app.load_csv"]
+    environment:
+      <<: *database
+      HIRED_EMPLOYEES_FILE: ${HIRED_EMPLOYEES_FILE}
+      DEPARTMENTS_FILE: ${DEPARTMENTS_FILE}
+      JOBS_FILE: ${JOBS_FILE}
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["tools"]
+
+volumes:
+  pgdata:
