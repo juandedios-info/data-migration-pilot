@@ -26,6 +26,9 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "8080:8000"
+    volumes:
+      # AVRO backups are kept when the container is removed.
+      - backups:/app/backups
     depends_on:
       db:
         condition: service_healthy
@@ -48,3 +51,4 @@ services:
 
 volumes:
   pgdata:
+  backups:

@@ -43,13 +43,14 @@ def insert_rows(conn, table, source, raw_rows) -> tuple[int, int]:
             rejected += 1
             continue
 
-        # Database rules: duplicate ids and foreign keys.
-        # The savepoint undoes only this row if the insert fails.
+        # Database rules: duplicate ids, foreign keys (IntegrityError), and
+        # values the column types do not accept, for example an id larger
+        # than INTEGER (DataError). The savepoint undoes only this row.
         try:
             with conn.transaction():
                 conn.execute(insert, [getattr(row, c) for c in columns])
             inserted += 1
-        except psycopg.errors.IntegrityError as error:
+        except (psycopg.errors.IntegrityError, psycopg.errors.DataError) as error:
             reject(conn, table, source, raw, error.diag.message_primary, error.sqlstate)
             rejected += 1
 

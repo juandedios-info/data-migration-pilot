@@ -84,7 +84,22 @@ Requirements: Docker with Docker Compose.
 4. Open the API documentation: http://127.0.0.1:8080/docs
 
 The database is published on port 5433, so it can be opened with a SQL client.
-To stop everything and delete the database volume:
+Back up and restore a table inside the API container. The backups are kept
+in the `backups` volume:
+
+```bash
+docker compose exec api python -m app.backup backup hired_employees
+docker compose exec api ls backups
+docker compose exec api python -m app.backup restore hired_employees backups/hired_employees_<timestamp>.avro
+```
+
+To copy the backups to your computer:
+
+```bash
+docker compose cp api:/app/backups ./backups
+```
+
+To stop everything and delete the database and backup volumes:
 
 ```bash
 docker compose down -v
