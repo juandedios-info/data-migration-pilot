@@ -31,6 +31,7 @@ sql/
 profiling/       SQL queries used to profile the raw data (DuckDB)
 docs/
   data_profile.md   profiling report and schema decisions
+  aws_architecture.md   design to run the project on AWS
   raw_data.sha256   checksums of the raw files
 Dockerfile
 docker-compose.yml
@@ -221,5 +222,6 @@ cancelled and nothing changes.
 - **Error responses:** do not return the full request body in validation errors.
 - **Automated tests** with pytest, run in GitHub Actions.
 - **Cloud deployment on AWS:** raw files in S3, the database in RDS, the API on
-  EC2 or ECS, the password in Secrets Manager, and logs in CloudWatch.
+  ECS, the password in Secrets Manager, and logs in CloudWatch. The design is
+  in [docs/aws_architecture.md](docs/aws_architecture.md).
 - **Visual report** for the metrics.
