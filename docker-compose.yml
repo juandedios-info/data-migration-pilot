@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: data_migration_poc
       POSTGRES_USER: app
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in ~/.config/data-migration-pilot.env}
     volumes:
       # The schema runs automatically the first time the database starts.
       - ./sql/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
@@ -43,8 +43,8 @@ services:
       DEPARTMENTS_FILE: ${DEPARTMENTS_FILE}
       JOBS_FILE: ${JOBS_FILE}
     volumes:
-      # Same path inside the container, so the file paths in .env work as they are.
-      - ${DATAWORK_DIR:?Set DATAWORK_DIR in .env}:${DATAWORK_DIR}:ro
+      # Same path inside the container, so the file paths in the configuration work as they are.
+      - ${DATAWORK_DIR:?Set DATAWORK_DIR in ~/.config/data-migration-pilot.env}:${DATAWORK_DIR}:ro
     depends_on:
       db:
         condition: service_healthy

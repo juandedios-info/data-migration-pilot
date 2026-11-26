@@ -9,7 +9,7 @@ from app.models import MODELS
 
 
 def connect() -> psycopg.Connection:
-    # Uses PGHOST, PGPORT, PGDATABASE and PGUSER. The password comes from ~/.pgpass.
+    # Uses PGHOST, PGPORT, PGDATABASE, PGUSER and PGPASSWORD.
     return psycopg.connect()
 
 

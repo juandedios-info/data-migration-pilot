@@ -12,7 +12,7 @@ When a type is specific to PostgreSQL, the standard SQL name is also given.
 Check that the raw files are unchanged:
 
 ```bash
-set -a; source .env; set +a
+set -a; source ~/.config/data-migration-pilot.env; set +a
 (cd "$DATAWORK_DIR" && shasum -a 256 -c -) < docs/raw_data.sha256
 ```
 

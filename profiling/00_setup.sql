@@ -1,5 +1,5 @@
 -- Setup: create one view for each raw CSV file.
--- The file paths come from the .env file, not from the code.
+-- The file paths come from ~/.config/data-migration-pilot.env, not from the code.
 -- All columns are read as text (VARCHAR), so we can see the raw values
 -- before converting them to other types.
 -- The files have no header, so the column names come from the data dictionary.

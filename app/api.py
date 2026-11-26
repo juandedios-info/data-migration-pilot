@@ -10,9 +10,10 @@ from dotenv import load_dotenv
 from fastapi import Body, FastAPI
 from psycopg.rows import dict_row
 
+from app import ENV_FILE
 from app.db import connect, insert_rows
 
-load_dotenv()
+load_dotenv(ENV_FILE)
 
 app = FastAPI(title="Data Migration PoC")
 
