@@ -61,7 +61,8 @@ In short:
 
 Requirements: Docker with Docker Compose.
 
-1. Put the raw CSV files in `data/raw/`, and create the configuration:
+1. Create the configuration, set `DATAWORK_DIR` in `.env`, and put the raw
+   CSV files in `$DATAWORK_DIR/raw/`:
 
    ```bash
    cp .env.example .env
@@ -116,19 +117,20 @@ Requirements: Python 3.12, [uv](https://docs.astral.sh/uv/), PostgreSQL.
    uv sync
    ```
 
-2. Put the raw CSV files in `data/raw/` and check them:
-
-   ```bash
-   shasum -a 256 -c docs/raw_data.sha256
-   ```
-
-3. Create the configuration from the template, and edit it:
+2. Create the configuration from the template, and edit it:
 
    ```bash
    cp .env.example .env
    ```
 
    The password is not stored in the project. It is read from `~/.pgpass`.
+
+3. Put the raw CSV files in `$DATAWORK_DIR/raw/` and check them:
+
+   ```bash
+   set -a; source .env; set +a
+   (cd "$DATAWORK_DIR" && shasum -a 256 -c -) < docs/raw_data.sha256
+   ```
 
 4. Create the database and the tables:
 
@@ -185,10 +187,10 @@ curl http://127.0.0.1:8000/metrics/departments-above-mean
 
 ```bash
 uv run python -m app.backup backup hired_employees
-uv run python -m app.backup restore hired_employees backups/hired_employees_<timestamp>.avro
+uv run python -m app.backup restore hired_employees <BACKUP_DIR>/hired_employees_<timestamp>.avro
 ```
 
-The restore runs in one transaction. If it would break a foreign key, it is
+The backups are saved in `BACKUP_DIR`, set in `.env`. The restore runs in one transaction. If it would break a foreign key, it is
 cancelled and nothing changes.
 
 ## Assumptions
