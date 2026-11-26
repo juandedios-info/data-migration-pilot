@@ -12,13 +12,13 @@ When a type is specific to PostgreSQL, the standard SQL name is also given.
 Check that the raw files are unchanged:
 
 ```bash
-shasum -a 256 -c docs/raw_data.sha256
+set -a; source .env; set +a
+(cd "$DATAWORK_DIR" && shasum -a 256 -c -) < docs/raw_data.sha256
 ```
 
 Run the profiling queries:
 
 ```bash
-set -a; source .env; set +a
 duckdb
 ```
 
@@ -43,13 +43,13 @@ The checksums were saved in `docs/raw_data.sha256` when the files were
 received. This command checks each file against them:
 
 ```bash
-shasum -a 256 -c docs/raw_data.sha256
+(cd "$DATAWORK_DIR" && shasum -a 256 -c -) < docs/raw_data.sha256
 ```
 
 ```text
-data/raw/departments.csv: OK
-data/raw/hired_employees (1).csv: OK
-data/raw/jobs.csv: OK
+raw/departments.csv: OK
+raw/hired_employees (1).csv: OK
+raw/jobs.csv: OK
 ```
 
 The three files have not changed.

@@ -32,7 +32,7 @@ flowchart LR
 
 | Local piece | AWS service | Why |
 | --- | --- | --- |
-| `data/raw/` | **S3** | Safe storage for the raw files. Versioning keeps every version of each file. |
+| `$DATAWORK_DIR/raw/` | **S3** | Safe storage for the raw files. Versioning keeps every version of each file. |
 | PostgreSQL | **RDS for PostgreSQL** | AWS manages the database server: automatic backups, and minor version updates in a maintenance window. |
 | Docker image | **ECR** | A private place to store the image built from the `Dockerfile`. |
 | API | **ECS on Fargate**, behind a **Load Balancer** | Runs the same container, with no servers to manage. The load balancer adds HTTPS and checks that the API is working. |

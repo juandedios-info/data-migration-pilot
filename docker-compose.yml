@@ -43,7 +43,8 @@ services:
       DEPARTMENTS_FILE: ${DEPARTMENTS_FILE}
       JOBS_FILE: ${JOBS_FILE}
     volumes:
-      - ./data:/app/data:ro
+      # Same path inside the container, so the file paths in .env work as they are.
+      - ${DATAWORK_DIR:?Set DATAWORK_DIR in .env}:${DATAWORK_DIR}:ro
     depends_on:
       db:
         condition: service_healthy
