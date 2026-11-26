@@ -12,6 +12,8 @@ from pathlib import Path
 
 import psycopg
 from dotenv import load_dotenv
+
+from app import ENV_FILE
 from fastavro import parse_schema, reader, writer
 from psycopg import sql
 
@@ -81,7 +83,7 @@ def restore(table, path) -> None:
 
 
 def main() -> None:
-    load_dotenv()
+    load_dotenv(ENV_FILE)
     match sys.argv[1:]:
         case ["backup", table] if table in FIELDS:
             backup(table)

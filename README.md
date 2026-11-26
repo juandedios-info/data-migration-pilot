@@ -61,15 +61,21 @@ In short:
 
 Requirements: Docker with Docker Compose.
 
-1. Create the configuration, set `DATAWORK_DIR` in `.env`, and put the raw
-   CSV files in `$DATAWORK_DIR/raw/`:
+1. Create the configuration outside the repository, set `DATAWORK_DIR` and
+   `POSTGRES_PASSWORD` in it, and put the raw CSV files in `$DATAWORK_DIR/raw/`:
 
    ```bash
-   cp .env.example .env
+   cp .env.example ~/.config/data-migration-pilot.env
+   chmod 600 ~/.config/data-migration-pilot.env
    ```
 
-   Set `POSTGRES_PASSWORD` in `.env`. If the password contains `$`, put it in
-   single quotes.
+   Tell Docker Compose to read it (once per terminal):
+
+   ```bash
+   export COMPOSE_ENV_FILES=~/.config/data-migration-pilot.env
+   ```
+
+   If the password contains `$`, put it in single quotes.
 
 2. Start the database and the API. The schema is created automatically:
 
@@ -117,18 +123,18 @@ Requirements: Python 3.12, [uv](https://docs.astral.sh/uv/), PostgreSQL.
    uv sync
    ```
 
-2. Create the configuration from the template, and edit it:
+2. Create the configuration outside the repository, and edit it
+   (`PGHOST`, `PGUSER`, `PGPASSWORD`, `DATAWORK_DIR`):
 
    ```bash
-   cp .env.example .env
+   cp .env.example ~/.config/data-migration-pilot.env
+   chmod 600 ~/.config/data-migration-pilot.env
    ```
-
-   The password is not stored in the project. It is read from `~/.pgpass`.
 
 3. Put the raw CSV files in `$DATAWORK_DIR/raw/` and check them:
 
    ```bash
-   set -a; source .env; set +a
+   set -a; source ~/.config/data-migration-pilot.env; set +a
    (cd "$DATAWORK_DIR" && shasum -a 256 -c -) < docs/raw_data.sha256
    ```
 
@@ -190,7 +196,7 @@ uv run python -m app.backup backup hired_employees
 uv run python -m app.backup restore hired_employees <BACKUP_DIR>/hired_employees_<timestamp>.avro
 ```
 
-The backups are saved in `BACKUP_DIR`, set in `.env`. The restore runs in one transaction. If it would break a foreign key, it is
+The backups are saved in `BACKUP_DIR`, set in the configuration file. The restore runs in one transaction. If it would break a foreign key, it is
 cancelled and nothing changes.
 
 ## Assumptions
@@ -203,16 +209,16 @@ cancelled and nothing changes.
 
 ## Security
 
-- No password in the project: the local setup uses `~/.pgpass`, and Docker
-  reads the password from `.env`, which is not committed.
+- No password in the project: settings and passwords are read from
+  `~/.config/data-migration-pilot.env`, outside the repository.
 - SQL values are always sent as parameters, and table names are composed with
   `psycopg.sql`, so the input cannot change the SQL.
 - The table name in the API is limited to the three tables.
 - Each request accepts at most 1,000 rows.
 - Backup and restore are command-line tools, not API endpoints, because a
   restore replaces a whole table.
-- The container runs as a non-root user, and the image does not include `.env`
-  or the data files.
+- The container runs as a non-root user, and the image does not include the
+  configuration or the data files.
 
 ## Next steps
 

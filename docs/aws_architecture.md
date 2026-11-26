@@ -39,7 +39,7 @@ flowchart LR
 | CSV loader | **ECS task**, run once | The same image with a different command, like `docker compose run loader`. |
 | AVRO backups | **ECS task** started by **EventBridge Scheduler**, saving files in **S3** | Backups run on a schedule, and the files are stored outside the database. |
 | AVRO restore | **ECS task**, run by hand | A restore replaces a whole table, so a person decides when to run it. |
-| `.env` and `~/.pgpass` | **Secrets Manager** | ECS gives the password to the container as `PGPASSWORD`. The code already reads this variable, so it does not change. |
+| `~/.config/data-migration-pilot.env` | **Secrets Manager** | ECS gives the password to the container as `PGPASSWORD`. The code already reads this variable, so it does not change. |
 | Terminal output | **CloudWatch Logs** | All the logs from the API, the loader and the backups in one place. |
 
 ## Network and security

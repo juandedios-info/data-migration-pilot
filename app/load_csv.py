@@ -8,6 +8,8 @@ import logging
 import os
 
 from dotenv import load_dotenv
+
+from app import ENV_FILE
 from psycopg import sql
 
 from app.db import connect, insert_rows
@@ -34,7 +36,7 @@ def read_csv(path, columns) -> list[dict]:
 
 
 def main() -> None:
-    load_dotenv()
+    load_dotenv(ENV_FILE)
     with connect() as conn:
         for table, model in MODELS.items():
             # The initial load runs only once.
